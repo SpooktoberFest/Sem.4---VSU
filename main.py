@@ -2,7 +2,6 @@
 #                                   Imports
 #======================================================================================
 import json
-from operator import attrgetter
 
 
 #======================================================================================
@@ -29,9 +28,58 @@ def outputData(data, outfilename): # Output data to JSON file
 
 def sortData(data): # Build new sorted list 
     
-    # Sort after dest_id first and weight second (largest numbers first)
-    dataout = sorted(data, key=attrgetter('dest_id', 'weight'), reverse=True)
-    return dataout
+    # Sort after dest_id (first priority)
+    # and weight (second priority) with smallest numbers first
+    data = sorted(data, key=lambda d: d['weight'], reverse=True)
+    data = sorted(data, key=lambda d: d['dest_id'])
+    return data
+
+
+def splitByUnique(data, str): # Split list into list of lists based on unique values of 'str' parameter
+    
+    newList = [[data[0]]]
+    newList.remove([data[0]])
+    index = -1
+    last_id = -1
+    
+    # Iterate through items
+    for item in data:
+
+        # Check uniqueness criteria (Depends on list being sorted!)
+        if last_id != item[str]:
+            # Make new sub-list with item and update parameters
+            newList.append([item])
+            last_id = item[str]
+            index += 1
+        else:
+            # Append item to sub-list else
+            newList[index].append(item)
+
+    return newList
+
+
+def splitBySum(data, str, max): # Split list into list of lists based on maximum sum of values in 'str' parameter
+    
+    newList = [[data[0]]]
+    newList.remove([data[0]])
+    index = -1
+    sum = 0
+    
+    # Iterate through items
+    for item in data:
+
+        # Check sum criteria
+        if sum + item[str] > max or index == -1:
+            # Make new sub-list with item and update parameters
+            newList.append([item])
+            sum = item[str]
+            index += 1
+        else:
+            # Append item to sub-list and add to sum
+            newList[index].append(item)
+            sum += item[str]
+    
+    return newList
 
 
 
@@ -54,13 +102,13 @@ def main():
 
     # Sort boxes
     data = sortData(data)
+    
 
+    # Split boxes by destination
+    data = splitByUnique(data, 'dest_id')
 
-    # Iterate through boxes
-    for box in data:
-        print(box)
-
-
+    for dest in data:
+        dest = splitBySum(dest, 'weight', 1000)
 
     
     # Output palleting solution
