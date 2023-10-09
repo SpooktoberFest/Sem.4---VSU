@@ -94,27 +94,44 @@ def main():
     # Hyperparameters
     infilename = 'boxes.json'
     outfilename = 'out.json'
+    out_width = 5
     
-
     # Load data on boxes
     data = loadBoxesData(infilename)
-
 
     # Sort boxes
     data = sortData(data)
     
-
     # Split boxes by destination
     data = splitByUnique(data, 'dest_id')
 
+    # Split box-destinations by pallet
     for dest in data:
-        dest = splitBySum(dest, 'weight', 1000)
-
+        split_result = splitBySum(dest, 'weight', 1000)
+        dest.clear()
+        dest.extend(split_result)
     
-    # Output palleting solution
+
+    # Print palleting solution to terminal
+    print('\n')
+    for dest in data: # Iterate through destinations
+        dest_id = dest[0][0]['dest_id']
+        print(f'\nTo destination with ID {dest_id} goes these pallets:')
+        
+        pallet_index = 0
+        for pallet in dest: # Iterate through pallets
+            pallet_index += 1
+            print(f'\tPallet {pallet_index} with boxes:')
+            weight = 0
+            for box in pallet: # Iterate through boxes
+                print(f'\t\t{box}')
+                weight += box['weight']
+            print(f'\t\t- Total weight: {weight:.2f} kg -')
+    print('\n')
+
+    # Output palleting solutio to JSON file
     outputData(data, outfilename)
     
-
     return 0
 
 

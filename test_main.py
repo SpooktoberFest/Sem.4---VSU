@@ -42,6 +42,7 @@ def test_splitByUnique():
     newlist = splitByUnique(dictlist, 'dest_id')
     assert len(newlist) == 2
 
+
 def test_splitBySum():
     newlist = splitBySum(dictlist, 'weight', 1000)
     assert len(newlist) == 4
