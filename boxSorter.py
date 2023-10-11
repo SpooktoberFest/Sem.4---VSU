@@ -5,7 +5,7 @@ import json
 
 
 #======================================================================================
-#                                   Auxiliary functions
+#                                   Auxiliary Functions
 #======================================================================================
 
 
@@ -58,46 +58,69 @@ def splitByUnique(data, str): # Split list into list of lists based on unique va
     return newList
 
 
-def splitBySum(data, str, max): # Split list into list of lists based on maximum sum of values in 'str' parameter
+def splitBySum(datain, str, max): # Split list into list of lists based on maximum sum of values in 'str' parameter
     
+    
+    data = datain.copy()
     newList = [[data[0]]]
     newList.remove([data[0]])
-    index = -1
     sum = 0
+    items = len(data)
+    index = -1
+    forTimes = 0
     
-    # Iterate through items
-    for item in data:
+    # Iterate through items as long as there are items
+    while items > 0:
+    
+        # Iterate through items
+        for item in data:
+            
+            # If first item or if list has no more applicable items
+            if forTimes > 1 or index == -1:
 
-        # Check sum criteria
-        if sum + item[str] > max or index == -1:
-            # Make new sub-list with item and update parameters
-            newList.append([item])
-            sum = item[str]
-            index += 1
-        else:
-            # Append item to sub-list and add to sum
-            newList[index].append(item)
-            sum += item[str]
+                # Make a new sub-list and update paramaters
+                sum = item['weight']
+                newList.append([item])
+                data.remove(item)
+                items -= 1
+                index += 1
+                forTimes = 0
+                break
+
+            # If sum will not supersed maximum
+            elif  sum + item[str] <= max:
+                
+                # Insert into sub-list and update paramaters
+                sum += item['weight']
+                newList[index].append(item)
+                data.remove(item)
+                items -= 1
+                break
+
+            # Break if list is empty
+            if items == 0:
+                break
+        
+        # If list has been looked through with no items applicable for insertion
+        forTimes += 1
     
     return newList
 
 
 
-
-
-
 #======================================================================================
-#                                   Main function
+#                                   Main Function
 #======================================================================================
-def main():
-
-    # Hyperparameters
-    infilename = 'boxes.json'
-    outfilename = 'out.json'
-    out_width = 5
+def main(inData = [], infilename = '', outfilename = ''):
     
-    # Load data on boxes
-    data = loadBoxesData(infilename)
+    # Load data on boxes depending on given input parameters
+    if infilename != '':
+        data = loadBoxesData(infilename)
+    elif inData != []:
+        data = inData
+    else:
+        print("\nError: No input given.\nEither use 'infilename' parameter to declare path of input JSON file,\nor input list of dicts directly via the 'inData' parameter.")
+        return []
 
     # Sort boxes
     data = sortData(data)
@@ -113,7 +136,6 @@ def main():
     
 
     # Print palleting solution to terminal
-    print('\n')
     for dest in data: # Iterate through destinations
         dest_id = dest[0][0]['dest_id']
         print(f'\nTo destination with ID {dest_id} goes these pallets:')
@@ -129,15 +151,17 @@ def main():
             print(f'\t\t- Total weight: {weight:.2f} kg -')
     print('\n')
 
-    # Output palleting solutio to JSON file
-    outputData(data, outfilename)
+    # Output palleting solution to JSON file if output destination is declared
+    if outfilename != '':
+        outputData(data, outfilename)
     
-    return 0
+    # Return palleting solution
+    return data
 
 
 #======================================================================================
 #                                   Execute
 #======================================================================================
 if __name__=="__main__": 
-    main() 
+    main(infilename='boxesIn.json', outfilename='boxesOut.json') 
 

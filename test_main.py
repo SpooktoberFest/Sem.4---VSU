@@ -1,7 +1,7 @@
 #======================================================================================
 #                                   Imports
 #======================================================================================
-from main import *
+from boxSorter import *
 
 
 #======================================================================================
@@ -22,14 +22,27 @@ dictlist = [
 
 
 #======================================================================================
-#                                   Tests
+#                                   Main Tests
 #======================================================================================
 
 
-def test_main_noerr():
-    assert main() == 0
+# Tests for empty out in case of no input
+def test_main_no_in_empty_out():
+    assert main() == []
 
 
+# Tests that output has the expected pallet-distribution between two destinations
+def test_main_out_lengths():
+    newlist = main(inData=dictlist)
+    assert [len(newlist[0]) , len(newlist[1])] == [2 , 2]
+
+
+#======================================================================================
+#                                   Auxiliary Function Tests
+#======================================================================================
+
+
+# Tests that sorting function yields the expected box order
 def test_sortData():
     newlist = sortData(dictlist)
     ids = []
@@ -38,20 +51,25 @@ def test_sortData():
     assert ids == [1, 2, 3, 4, 5, 6, 7, 8]
 
 
-def test_splitByUnique():
+# Tests that this splitting function yields the expected number of destinations when unsorted and sorted
+def test_splitByUnique_unsorted():
     newlist = splitByUnique(dictlist, 'dest_id')
     assert len(newlist) == 2
 
+def test_splitByUnique_sorted():
+    newlist = sortData(dictlist)
+    newlist = splitByUnique(newlist, 'dest_id')
+    assert len(newlist) == 2
 
-def test_splitBySum():
+
+# Tests that this splitting function yields the expected number of pallets when unsorted and sorted
+def test_splitBySum_unsorted():
     newlist = splitBySum(dictlist, 'weight', 1000)
     assert len(newlist) == 4
 
-
-
-
-
-
-
+def test_splitBySum_sorted():
+    newlist = sortData(dictlist)
+    newlist = splitBySum(newlist, 'weight', 1000)
+    assert len(newlist) == 4
 
 
