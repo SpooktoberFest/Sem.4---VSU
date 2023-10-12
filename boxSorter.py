@@ -67,16 +67,17 @@ def splitBySum(datain, str, max): # Split list into list of lists based on maxim
     sum = 0
     items = len(data)
     index = -1
-    forTimes = 0
+    makeNew = True
     
     # Iterate through items as long as there are items
     while items > 0:
     
         # Iterate through items
+        noInserts = True
         for item in data:
             
             # If first item or if list has no more applicable items
-            if forTimes > 1 or index == -1:
+            if makeNew:
 
                 # Make a new sub-list and update paramaters
                 sum = item['weight']
@@ -84,7 +85,8 @@ def splitBySum(datain, str, max): # Split list into list of lists based on maxim
                 data.remove(item)
                 items -= 1
                 index += 1
-                forTimes = 0
+                noInserts = False
+                makeNew = False
                 break
 
             # If sum will not supersed maximum
@@ -95,6 +97,7 @@ def splitBySum(datain, str, max): # Split list into list of lists based on maxim
                 newList[index].append(item)
                 data.remove(item)
                 items -= 1
+                noInserts = False
                 break
 
             # Break if list is empty
@@ -102,7 +105,8 @@ def splitBySum(datain, str, max): # Split list into list of lists based on maxim
                 break
         
         # If list has been looked through with no items applicable for insertion
-        forTimes += 1
+        if noInserts:
+            makeNew = True
     
     return newList
 

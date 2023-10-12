@@ -62,7 +62,7 @@ def test_splitByUnique_sorted():
     assert len(newlist) == 2
 
 
-# Tests that this splitting function yields the expected number of pallets when unsorted and sorted
+# Tests that this splitting function yields the expected number of pallets when unsorted and sorted and with different weights
 def test_splitBySum_unsorted():
     newlist = splitBySum(dictlist, 'weight', 1000)
     assert len(newlist) == 4
@@ -71,5 +71,9 @@ def test_splitBySum_sorted():
     newlist = sortData(dictlist)
     newlist = splitBySum(newlist, 'weight', 1000)
     assert len(newlist) == 4
+
+def test_splitBySum_2000kg():
+    newlist = splitBySum(dictlist, 'weight', 2000)
+    assert len(newlist) == 2
 
 
